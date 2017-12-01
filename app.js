@@ -12,10 +12,7 @@ var authorization = require("./app_modules/session-authorization");
 var index = require('./routes/index');
 var users = require('./routes/users');
 var login = require("./routes/login");
-var quest = {
-  admin: require("./routes/quest/admin"),
-  guest: require("./routes/quest/guest")
-};
+var admin = require("./routes/admin");
 
 var app = express();
 
@@ -44,9 +41,8 @@ app.use(session({
 
 app.use("/login", login);
 app.use("/", authorization.sessionCheck, index);
+app.use("/admin", admin);
 app.use('/users', users);
-app.use("/quest/admin", quest.admin);
-app.use("/quest/", quest.guest);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

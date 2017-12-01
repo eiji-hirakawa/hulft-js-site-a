@@ -1,14 +1,44 @@
 <!DOCTYPE html>
 <html lang="ja-JP">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+  <script src="/javascripts/angular.min.js"></script>
+  <script src="/javascripts/case-model.js"></script>
+  <link rel="stylesheet" href="stylesheets/reset.css">
   <link rel="stylesheet" href="stylesheets/style.css">
-  <title>Home</title>
+  <title>home</title>
 </head>
+
 <body>
-  <h1><%= title %></h1>
-  <p>Hello, <%= user %></p>
+  <div ng-app="CaseModel" ng-controller="CaseController">
+    <div ng-show="accept">
+      <fieldset>
+        <legend>Question</legend>
+        <h1 class="subject">
+          <span class="index">{{ index }}</span>{{ subject }}</h1>
+        <p class="content">{{ content }}</p>
+      </fieldset>
+      <fieldset>
+        <legend>Answer</legend>
+        <ul class="case">
+          <li ng-repeat="choice in choices">
+            <label>
+              <input type="{{ type }}" ng-model="choice.checked">
+              <span>{{ choice.text }}</span>
+            </label>
+
+          </li>
+        </ul>
+      </fieldset>
+      <span class="submit" ng-click="submit()">submit</span>
+    </div>
+    <div class="close" ng-show="!accept">NOW PRINTING</div>
+  </div>
 </body>
+
 </html>

@@ -1,0 +1,39 @@
+
+body {
+    font: 18px "Lucida Grande", Helvetica, Arial, sans-serif;
+    margin:20px;
+    word-wrap:break-word;
+  }
+  
+  a {
+    color: rgb(255, 196, 0);
+  }
+  
+  fieldset{
+    color:rgb(153, 153, 153);
+    border: 1px dotted #ccc;
+    padding:1em;
+    margin:1em 0;
+    border-radius: 4px;
+  }
+  legend{
+    padding:0 .5em;
+  }
+
+span.submit, input[type=submit]{
+    display: inline-block;
+    border: 1px dotted #ccc;
+    border-radius: 4px;
+    background-color: #ddd;
+    padding:.18em .64em;
+    cursor: pointer;
+    line-height: 1.8em;
+    width:180px;
+  }
+  input{
+    margin: 2em;
+    display: block
+  }
+.err-msg{
+    color:red;
+}
