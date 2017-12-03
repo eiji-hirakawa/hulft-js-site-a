@@ -4,59 +4,65 @@ var router = express.Router();
 var sqlite = require("../app_modules/db.js");
 var db = sqlite.init("../db/demo.db");
 
-// // socket.io server
-// var socket = require('socket.io-client')('http://localhost:3000');
-// socket.on('connect', function(){
-//     console.log("admin.js socket connect");
-// });
-// socket.on('event', function(data){
-//     console.log("admin.js socket event");
-// });
-// socket.on('disconnect', function(){
-//     console.log("admin.js socket disconnect");
-// });
 
+const http = require('http').Server(express());
+const io = require('socket.io')(http);
+const PORT = 3100;
 
+io.on('connection', (socket) => {
+    console.log(`app-socket connection of ${socket.id}`);
+    socket.on("client2admin", (data) => {
+        io.emit("client2admin", data);
+    });
+});
+http.listen(PORT, () => console.log(`app-socket listening on *:${PORT}`));
 
-// var socketio = require("socket.io")();
-// // クライアント接続あり
-// socketio.on("connection", (socket) => {
-//     // 接続通知→クライアント
-//     socketio.emit("sendMessageToClient", { value: "entry guest" });
-//     // クライアントからの受信
-//     socket.on("sendMessageToServer", (data) => {
-//         socketio.emit("sendMessageToClient", { value: data.value });
-//     });
-
-//     //接続切れイベントを設定
-//     socket.on("disconnect", function () {
-//         socketio.emit("sendMessageToClient", { value: "exit guest" });
-//     });
-
-// });
 var getWorksheets = (callback) => {
     db.serialize(() => {
-        db.each("select * from Worksheet",
-            (err, row) => {
-                if (err) {
-                    throw err;
-                }
-                callback(row);
-            });
+        db.all("select * from Worksheet", callback);
     });
 };
 router.get("/", (req, res, next) => {
-    getWorksheets(row => {
-        var id = row.Id;
-        console.log("id : " + id);
+    getWorksheets((err, rows) => {
+        if(err){
+            res.render('error', {
+                message: "DBエラー",
+                error: {
+                    status: err.status,
+                    stack : err.stack
+                }
+            });
+        }
+        else{
+            res.render("admin", {
+                title: "アンケート管理",
+                datas :rows
+            });
+        }
     });
-    res.render("admin", {
-        title: "アンケート管理",
-        datas :[
-            "foo",
-            "var",
-            "bin"
-        ]
+});
+
+router.post("/", (req, res) => {
+    db.serialize(() => {
+        db.all("select * from Worksheet join WorksheetQuestion on Worksheet.Id=WorksheetQuestion.WorksheetId where Worksheet.Id=$id",
+        { $id: req.body.id },
+        (err, rows) => {
+            if(err || rows.length == 0){
+                res.status(500).send();
+            }
+            else{
+                var row = rows[0];
+                io.emit('admin2client', {
+                    Id: req.body.id,
+                    Index : row.Index,
+                    Subject: row.Subject,
+                    Content: row.Content,
+                    Type: row.IsMultiple ? "checkbox" : "radio" ,
+                    rows: rows
+                });
+                res.status(200).send();
+            }
+        });
     });
 });
 

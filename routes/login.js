@@ -117,11 +117,14 @@ router.post("/", (req, res, next) => {
             .then(
                 // correct
                 (value) => {
-                    req.session.user = req.body.username;
                     var relativepath = req.session.referer && req.session.referer != ""
-                        ? req.session.referer
-                        : "/" ;
-                    res.redirect(".." + relativepath);
+                    ? req.session.referer
+                    : "/" ;
+                    req.session.user = req.body.username;
+                    req.session.save((err) => 
+                    {
+                        res.redirect(".." + relativepath);
+                    });
                 },
                 // incorrect
                 (reason) => {

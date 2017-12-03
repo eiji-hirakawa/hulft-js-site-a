@@ -13,6 +13,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var login = require("./routes/login");
 var admin = require("./routes/admin");
+var question = require("./routes/question");
 
 var app = express();
 
@@ -43,6 +44,7 @@ app.use("/login", login);
 app.use("/", authorization.sessionCheck, index);
 app.use("/admin", admin);
 app.use('/users', users);
+app.use('/question', question);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -61,22 +63,5 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-// =========== socket.io server =========== 
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-const PORT = 3100;
-io.on('connection', (socket) => {
-    console.log('a user connected');
-    socket.on('chat message', (msg) => {
-        io.emit('chat message', {
-          date: Date.now().toString(),
-          message: msg
-        });
-        console.log(`message: ${msg}`);
-    });
-});
-http.listen(PORT, () => console.log(`listening on *:${PORT}`));
-// ================================= 
 
 module.exports = app;
