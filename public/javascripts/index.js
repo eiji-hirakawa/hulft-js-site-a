@@ -1,5 +1,6 @@
 
-  var socket = io(window.location.hostname + ":3100");
+  // var socket = io("http://localhost:3100");
+  var socket = io(window.location.protocol + "://" + window.location.hostname + ":3100");
   $(function () {
     $(".submit").on("click", function (ev) {
       if ($(".submit").hasClass("btn-disable"))

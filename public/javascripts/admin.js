@@ -2,7 +2,7 @@ var CurrentSheet = {
 	id: -1,
 	chart: null
 }
-var socket = io(window.location.hostname + ":3100");
+var socket = io(window.location.protocol + "://" + window.location.hostname + ":3100");
 
 $(function () {
 	socket.on("client2admin", function (data) {
