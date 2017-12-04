@@ -7,7 +7,17 @@ var db = sqlite.init("../db/demo.db");
 
 const http = require('http').Server(express());
 const io = require('socket.io')(http);
-const PORT = 3100;
+// io.configure(function () { 
+//     io.set("transports", ["xhr-polling"]); 
+//     io.set("polling duration", 10); 
+//  });
+const PORT = 443;
+
+http.listen(PORT, () => console.log(`app-socket listening on *:${PORT}`));
+// const PORT = 3200;
+// var server =  express().listen(PORT);
+// var io = require('socket.io').listen(server);
+// var http = require('http');
 
 var openQuestion = null;
 io.on('connection', (socket) => {
@@ -20,7 +30,6 @@ io.on('connection', (socket) => {
         io.emit("client2admin", data);
     });
 });
-http.listen(PORT, () => console.log(`app-socket listening on *:${PORT}`));
 
 var getWorksheets = (callback) => {
     db.serialize(() => {

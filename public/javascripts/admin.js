@@ -2,7 +2,9 @@ var CurrentSheet = {
 	id: -1,
 	chart: null
 }
-var socket = io(window.location.protocol + "://" + window.location.hostname + ":3100");
+// var protocol = 
+var socket = io("wss://" + window.location.hostname + ":443");
+// var socket = io("wss://localhost:443");
 
 $(function () {
 	socket.on("client2admin", function (data) {
@@ -46,6 +48,7 @@ $(function () {
 				"id": id
 			}),
 		}).done(function (data, textStatus, jqXHR) {
+			alert("success");
 		}).fail(function (jqXHR, textStatus, errorThrown) {
 			alert("failed:" + textStatus);
 		});
