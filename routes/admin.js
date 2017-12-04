@@ -11,7 +11,7 @@ const io = require('socket.io')(http);
 //     io.set("transports", ["xhr-polling"]); 
 //     io.set("polling duration", 10); 
 //  });
-const PORT = 443;
+const PORT = 3200;
 
 http.listen(PORT, () => console.log(`app-socket listening on *:${PORT}`));
 // const PORT = 3200;

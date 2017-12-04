@@ -3,7 +3,7 @@ var CurrentSheet = {
 	chart: null
 }
 // var protocol = 
-var socket = io("wss://" + window.location.hostname + ":443");
+var socket = io("wss://" + window.location.hostname + ":3200");
 // var socket = io("wss://localhost:443");
 
 $(function () {
