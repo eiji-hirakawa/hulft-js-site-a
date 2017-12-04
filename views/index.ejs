@@ -8,6 +8,7 @@
 
   <script src="javascripts/jquery-3.2.1.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="/javascripts/index.js"></script>
   <link rel="stylesheet" href="stylesheets/reset.css">
   <link rel="stylesheet" href="stylesheets/style.css">
   <title>home</title>
@@ -33,67 +34,4 @@
       In Preparation...</div>
   </div>
 </body>
-<script>
-  var socket = io("localhost:3100");
-  $(function () {
-    $(".submit").on("click", function (ev) {
-      if ($(".submit").hasClass("btn-disable"))
-        return;
-      var data = {
-        id: ev.target.id,
-        selects: []
-      };
-      $(".input-define").each(function (i, e) {
-        if ($(e).prop("checked")) {
-          data.selects.push({
-            id:e.id.replace("q", ""),
-            value: true
-          });
-        }
-      });
-      $(".input-other").each(function (i, e) {
-        var text = $(e).val();
-        if (text.length > 0) {
-          data.selects.push({
-            id:e.id.replace("q", ""),
-            value: text
-          });
-        }
-      });
-
-      socket.emit("client2admin", data);
-      $(".submit").addClass("btn-disable");
-    });
-
-    socket.on("admin2client", function (data) {
-      console.log(data);
-      if (data.rows.length > 0) {
-        $(".submit").attr("id", data.Id);
-        $(".subject").html("<span class='index'>" + data.Index + "</span>" + data.Subject);
-        $(".content").html(data.Content);
-        $(".case").empty();
-        var s = "";
-        for (var i = 0; i < data.rows.length; i++) {
-          var isOther = data.rows[i].IsOther == "1";
-          s += "<li>";
-          s += "<label>";
-          if (!isOther) {
-            s += "<input id='q" + data.rows[i].QId + "' type='" + data.Type + "' name='ans' class='input-define'>";
-          }
-          s += "<span>" + data.rows[i].Text + "</span>";
-          if (isOther) {
-            s += "<input id='q" + data.rows[i].QId + "'type='text' value='' class='input-other'>";
-          }
-          s += "</label>";
-          s += "</li>";
-        }
-        $(".case").html(s);
-        $(".close").hide();
-        $(".submit").removeClass("btn-disable");
-      }
-    });
-    $(".close").show();
-  });
-</script>
-
 </html>

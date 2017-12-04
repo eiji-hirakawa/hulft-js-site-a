@@ -1,143 +1,21 @@
 <!DOCTYPE html>
 <html lang="ja-JP">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="javascripts/jquery-3.2.1.min.js"></script>
     <script src="javascripts/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-    <script src="javascripts/vertical-tabs.js"></script>
     <script src="javascripts/amcharts/amcharts.js"></script>
     <script src="javascripts/amcharts/serial.js"></script>
     <script src="javascripts/amcharts/pie.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        var current = {
-            id: -1,
-            chart: null
-        }
-        var socket = io("localhost:3100");
-        // var socket = io("hulft-js-site-a.herokuapp.com:3100");
-
-        $(function () {
-            socket.on("client2admin", function (data) {
-                if (current.id == data.id && current.chart) {
-                    for (var i = 0; i < current.chart.dataProvider.length; i++) {
-                        var dp = current.chart.dataProvider[i];
-                        var sel = findSelectionItem(dp.QId, data.selects);
-                        if (sel) {
-                            dp.Aggregate++;
-                            if (dp.IsOther) {
-                                $("#o" + current.id).append("<span>" + sel.value + "</span>");
-                            }
-                        }
-                    }
-                    current.chart.validateData();
-                }
-            });
-            function findSelectionItem(qid, selects) {
-                for (var i = 0; i < selects.length; i++) {
-                    if (selects[i].id == qid)
-                        return selects[i];
-                }
-                return null;
-            }
-            $("#demo2").tabs({ orientation: "vertical" });
-            $(".tabhead").on("click", function (ev) {
-                var $a = $(ev.target);
-                var id = $a.attr("href").replace("#q", "");
-                getQuestion(id);
-            });
-            $(".submit").on("click", function (ev) {
-                var id = ev.target.id.replace("submit-", "");
-                $.post({
-                    type: "POST",
-                    url: "/admin",
-                    contentType: 'application/json',
-                    data: JSON.stringify({ "id": id }),
-                }).done(function (data, textStatus, jqXHR) {
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    alert("failed:" + textStatus);
-                });
-            });
-            $(".save").on("click", function (ev) {
-                var senddata = {
-                    "id": ev.target.id.replace("save-", "")
-                };
-                $.post({
-                    type: "POST",
-                    url: "/save",
-                    contentType: 'application/json',
-                    data: JSON.stringify(senddata)
-                }).done(function (data, textStatus, jqXHR) {
-                    alert("success");
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    alert("failed:" + textStatus);
-                });
-            });
-            function initializeQuestion(id, data) {
-                var s = "<ol>";
-                for (var i = 0; i < data.length; i++) {
-                    s += "<li>" + data[i].Text + "</li>";
-                }
-                s += "</ol>"
-                $("#c" + id).html(s);
-            }
-            function initializeGraph(id, data) {
-                $("#g" + id).empty();
-                current.id = id;
-                current.chart = AmCharts.makeChart("g" + id, {
-                    "theme": "none",
-                    "type": "serial",
-                    "dataProvider": data,
-                    "valueAxes": [{
-                        "title": "アンケート結果"
-                    }],
-                    "graphs": [{
-                        "labelText": "[[Aggregate]]",
-                        "fillAlphas": 1,
-                        "lineAlpha": 0.2,
-                        "title": "Aggregate",
-                        "type": "column",
-                        "valueField": "Aggregate"
-                    }],
-                    "rotate": true,
-                    "categoryField": "Text",
-                    "categoryAxis": {
-                        "gridPosition": "start",
-                        "fillAlpha": 0.05,
-                        "position": "left"
-                    }
-                });
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].IsOther) {
-                        $("#o" + id).show();
-                        break;
-                    }
-                }
-            }
-            function getQuestion(id) {
-                $.post({
-                    type: "POST",
-                    url: "/question",
-                    contentType: 'application/json',
-                    data: JSON.stringify({ "id": id }),
-                }).done(function (data, textStatus, jqXHR) {
-                    initializeQuestion(id, data);
-                    initializeGraph(id, data);
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    alert("failed:" + textStatus);
-                });
-            }
-            getQuestion(1);
-        });
-    </script>
-
+    <script src="javascripts/admin.js"></script>
+    
     <link rel="stylesheet" href="stylesheets/reset.css">
     <link rel="stylesheet" href="stylesheets/style.css">
     <link rel="stylesheet" href="stylesheets/jquery-ui.css">
-    <link rel="stylesheet" href="stylesheets/vertical-tabs.css">
+    <link rel="stylesheet" href="stylesheets/admin.css">
     <title>
         <%= title %>
     </title>
@@ -166,6 +44,7 @@
                 <div id="c<%=datas[i].Id%>" class="choose"></div>
                 <div id="submit-<%=datas[i].Id%>" class="submit">送信</div>
                 <div id="save-<%=datas[i].Id%>" class="save">保存</div>
+                <div id="clear-<%=datas[i].Id%>" class="clear">クリア</div>
                 <div id="g<%=datas[i].Id%>" class="graph"></div>
                 <div id="o<%=datas[i].Id%>" class="others">
                     <p>その他</p>

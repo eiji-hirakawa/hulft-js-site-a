@@ -14,6 +14,7 @@ var users = require('./routes/users');
 var login = require("./routes/login");
 var admin = require("./routes/admin");
 var question = require("./routes/question");
+var updatedb = require("./routes/update");
 
 var app = express();
 
@@ -45,6 +46,7 @@ app.use("/", authorization.sessionCheck, index);
 app.use("/admin", admin);
 app.use('/users', users);
 app.use('/question', question);
+app.use('/update', updatedb);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -9,8 +9,13 @@ const http = require('http').Server(express());
 const io = require('socket.io')(http);
 const PORT = 3100;
 
+var openQuestion = null;
 io.on('connection', (socket) => {
+    if(openQuestion){
+        socket.emit("admin2client", openQuestion);
+    }
     console.log(`app-socket connection of ${socket.id}`);
+
     socket.on("client2admin", (data) => {
         io.emit("client2admin", data);
     });
@@ -52,14 +57,15 @@ router.post("/", (req, res) => {
             }
             else{
                 var row = rows[0];
-                io.emit('admin2client', {
+                openQuestion = {
                     Id: req.body.id,
                     Index : row.Index,
                     Subject: row.Subject,
                     Content: row.Content,
                     Type: row.IsMultiple ? "checkbox" : "radio" ,
                     rows: rows
-                });
+                };
+                io.emit('admin2client', openQuestion);
                 res.status(200).send();
             }
         });
