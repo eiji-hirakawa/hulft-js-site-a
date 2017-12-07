@@ -1,5 +1,5 @@
 
-var socket = io("wss://" + window.location.hostname + ":3200");
+var socket = io("ws://" + window.location.hostname + ":3200");
 // var socket = io(window.location.protocol + "://" + window.location.hostname + ":3200");
   $(function () {
     $(".submit").on("click", function (ev) {
