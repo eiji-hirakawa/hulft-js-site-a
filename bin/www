@@ -22,6 +22,122 @@ app.set('port', port);
 var server = http.createServer(app);
 
 /**
+ * WebSocket Server
+ */
+
+var sqlite = require("../app_modules/db.js");
+var db = sqlite.init("../db/demo.db");
+
+var WebSocketServer = require('websocket').server;
+var wsServer = new WebSocketServer({
+    httpServer: server,
+    path: "/socket",
+    maxReceivedFrameSize: 0x1000000,
+    autoAcceptConnections: false
+});
+
+// 管理ホスト
+var admin = null;
+var clients = [];
+var openQuestion = null;
+
+// エージェントの削除
+var removeClient = (key) => {
+    for (var i = 0; i < clients.length; i++) {
+        if (clients[i].key == key) {
+            clients.splice(i, 1);
+            break;
+        }
+    }
+};
+
+wsServer.on("request", req => {
+    var connection = req.accept(null, req.origin);
+    connection.on("message", msg => {
+        data = JSON.parse(msg.utf8Data);
+        if(data.protocol == "admin")
+        {
+            if(data.type == "connection"){
+                admin = {
+                    key: req.key,
+                    con: connection
+                };
+            }
+        }
+        else{
+            if(data.type == "connection"){
+                clients.push({
+                    key: req.key,
+                    con: connection
+                });
+                if(openQuestion){
+                    connection.sendUTF(JSON.stringify(openQuestion));
+                }
+            }
+            else if(data.type == "question"){
+              admin.con.sendUTF(JSON.stringify(data));
+            }
+        }
+    });
+    connection.on("close", con => {
+        removeClient(req.key);
+        if(admin && admin.key == req.key){
+            admin = null;
+        }
+    });
+});
+
+app.post("/admin", (req, res) => {
+  db.serialize(() => {
+      db.all("select * from Worksheet join WorksheetQuestion on Worksheet.Id=WorksheetQuestion.WorksheetId where Worksheet.Id=$id",
+      { $id: req.body.id },
+      (err, rows) => {
+          if(err || rows.length == 0){
+              res.status(500).send();
+          }
+          else{
+              var row = rows[0];
+              openQuestion = {
+                  protocol: "admin",
+                  type: "question",
+                  Id: req.body.id,
+                  Index : row.Index,
+                  Subject: row.Subject,
+                  Content: row.Content,
+                  Type: row.IsMultiple ? "checkbox" : "radio" ,
+                  rows: rows
+              };
+              clients.forEach(e => {
+                  e.con.sendUTF(JSON.stringify(openQuestion));
+              });
+              res.status(200).send();
+          }
+      });
+  });
+});
+
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+
+// error handler
+app.use(function (err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+
+
+/**
  * Listen on provided port, on all network interfaces.
  */
 

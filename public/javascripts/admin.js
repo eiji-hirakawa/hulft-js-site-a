@@ -2,24 +2,32 @@ var CurrentSheet = {
 	id: -1,
 	chart: null
 }
-// var protocol = 
-var socket = io("ws://" + window.location.hostname + ":3200");
-// var socket = io("wss://localhost:443");
-
+var socket = null;
 $(function () {
-	socket.on("client2admin", function (data) {
-		if (CurrentSheet.id == data.id && CurrentSheet.chart) {
-			for (var i = 0; i < CurrentSheet.chart.dataProvider.length; i++) {
-				var dp = CurrentSheet.chart.dataProvider[i];
-				var sel = findSelectionItem(dp.QId, data.selects);
-				if (sel) {
-					dp.Aggregate++;
-					if (dp.IsOther) {
-						$("#o" + CurrentSheet.id).append("<span>" + sel.value + "</span>");
+	socket = new WebSocket("ws://" + location.host + "/socket/");
+	// 接続確立
+	socket.onopen = function () {
+		socket.send(JSON.stringify({
+			protocol: "admin",
+			type: "connection"
+		}));
+	};
+	socket.onmessage = (function (e) {
+		var data = JSON.parse(e.data);
+		if (data.protocol == "client" && data.type == "question") {
+			if (CurrentSheet.id == data.id && CurrentSheet.chart) {
+				for (var i = 0; i < CurrentSheet.chart.dataProvider.length; i++) {
+					var dp = CurrentSheet.chart.dataProvider[i];
+					var sel = findSelectionItem(dp.QId, data.selects);
+					if (sel) {
+						dp.Aggregate++;
+						if (dp.IsOther) {
+							$("#o" + CurrentSheet.id).append("<span>" + sel.value + "</span>");
+						}
 					}
 				}
+				CurrentSheet.chart.validateData();
 			}
-			CurrentSheet.chart.validateData();
 		}
 	});
 
