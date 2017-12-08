@@ -1,7 +1,7 @@
-
-  var socket = null;
+var socket = null;
 $(function () {
-  socket = new WebSocket("wss://" + location.host + "/socket/");
+  var protocol = location.protocol.replace("http", "ws");
+  socket = new WebSocket(protocol + "//" + location.host + "/socket/");
   socket.onopen = function () {
     socket.send(JSON.stringify({
       protocol: "client",
@@ -25,15 +25,15 @@ $(function () {
         });
       }
     });
-    $(".input-other").each(function (i, e) {
-      var text = $(e).val();
-      if (text.length > 0) {
+    if($(".input-other").prop("checked")){
+      var textbox = $(".case").find("input[type='text']");
+      if(textbox.length > 0 && textbox.val().trim().length > 0){
         data.selects.push({
-          id: e.id.replace("q", ""),
-          value: text
+          id: $(".input-other").attr("id").replace("q", ""),
+          value: textbox.val().trim()
         });
       }
-    });
+    }
     socket.send(JSON.stringify(data));
 
     $(".submit").addClass("btn-disable");
@@ -55,20 +55,29 @@ $(function () {
           var input = $("<input>").attr({
             "id": "q" + data.rows[i].QId,
             "class": isOther ? "input-other" : "input-define",
-            "type": isOther ? "text" : data.Type,
+            "type": data.Type,
             "name": "ans",
           });
           var span = $("<span>").text(data.rows[i].Text);
+          label.append(input);
+          label.append(span);
           if (isOther) {
-            label.append(span);
-            label.append(input);
-          } else {
-            label.append(input);
-            label.append(span);
+            var textbox = $("<input>").attr({
+              "id": "q" + data.rows[i].QId,
+              "type": "text"
+            }).prop("disabled", true);
+            label.append(textbox);
           }
           li.append(label);
           $(".case").append(li);
         }
+        $(".case").find("input[name='ans']").on("click", function () {
+          var textbox = $(".case").find("input[type='text']");
+          if (textbox.length > 0) {
+            var ischk = $(".case").find("input.input-other").is(":checked");
+            textbox.prop('disabled', !ischk);
+          }
+        });
         $(".close").hide();
         $(".submit").removeClass("btn-disable");
       }
