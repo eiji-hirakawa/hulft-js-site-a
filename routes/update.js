@@ -21,7 +21,7 @@ router.post("/", (req, res, next) => {
     }
     queries.push({
         table: "Worksheet",
-        set: "OtherText=" + req.body.OtherText,
+        set: "OtherText='" + req.body.others + "'",
         where: "Id=" + req.body.id
     });
     db.serialize(() => {

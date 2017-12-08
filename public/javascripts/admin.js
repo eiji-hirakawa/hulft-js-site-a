@@ -113,15 +113,16 @@ $(function () {
 	function initializeQuestion(id, data) {
 		$("#c" + id).empty();
 		var ol = $("<ol>");
-		for (var i = 0; i < data.length; i++) {
+		for (var i = 0; i < data.rows.length; i++) {
+			var row = data.rows[i];
 			var pbtn = $("<span>+</span>")
-				.attr("id", "pb-" + data[i].QId)
+				.attr("id", "pb-" + row.QId)
 				.addClass("pmbtn")
 				.on("click", function (ev) {
 					updateDataProvider(ev.target.id.replace("pb-", ""), 1);
 				});
 			var mbtn = $("<span>-</span>")
-				.attr("id", "mb-" + data[i].QId)
+				.attr("id", "mb-" + row.QId)
 				.addClass("pmbtn")
 				.on("click", function (ev) {
 					updateDataProvider(ev.target.id.replace("mb-", ""), -1);
@@ -130,7 +131,7 @@ $(function () {
 				.addClass("btnwrap")
 				.append(pbtn)
 				.append(mbtn);
-			var li = $("<li>").append(data[i].Text).append(btnwrap);
+			var li = $("<li>").append(row.Text).append(btnwrap);
 			ol.append(li);
 		}
 		$("#c" + id).append(ol);
@@ -151,12 +152,11 @@ $(function () {
 	function initializeGraph(id, data) {
 		$("#g" + id).empty();
 		$("#o" + id).empty();
-		$("#o" + id).hide();
 		CurrentSheet.id = id;
 		CurrentSheet.chart = AmCharts.makeChart("g" + id, {
 			"theme": "none",
 			"type": "serial",
-			"dataProvider": data,
+			"dataProvider": data.rows,
 			"valueAxes": [{
 				"title": "アンケート結果"
 			}],
@@ -176,10 +176,10 @@ $(function () {
 				"position": "left"
 			}
 		});
-		for (var i = 0; i < data.length; i++) {
-			if (data[i].IsOther) {
-				$("#o" + id).show();
-				break;
+		if(data.others.length > 0){
+			var others = data.others.split(",");
+			for(var i = 0; i < others.length; i++){
+				$("#o" + id).append("<span>" + others[i] + "</span>");
 			}
 		}
 	}
