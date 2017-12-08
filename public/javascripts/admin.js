@@ -115,16 +115,16 @@ $(function () {
 		var ol = $("<ol>");
 		for (var i = 0; i < data.length; i++) {
 			var pbtn = $("<span>+</span>")
-				.attr("id", "pb-" + id)
+				.attr("id", "pb-" + data[i].QId)
 				.addClass("pmbtn")
 				.on("click", function (ev) {
-					updateDataProvider(id, 1);
+					updateDataProvider(ev.target.id.replace("pb-", ""), 1);
 				});
 			var mbtn = $("<span>-</span>")
-				.attr("id", "mb-" + id)
+				.attr("id", "mb-" + data[i].QId)
 				.addClass("pmbtn")
 				.on("click", function (ev) {
-					updateDataProvider(id, -1);
+					updateDataProvider(ev.target.id.replace("mb-", ""), -1);
 				});
 			var btnwrap = $("<div>")
 				.addClass("btnwrap")
