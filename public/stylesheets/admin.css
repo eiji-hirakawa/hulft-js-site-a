@@ -57,10 +57,16 @@ h2{
 	display: inline-block;
 	border: 1px dotted #ccc;
 	border-radius: 4px;
-	background-color: #ddd;
 	padding:.18em .64em;
 	cursor: pointer;
 	line-height: 1.8em;
+}
+
+.submit, .clear{
+	background-color:  #ccc;
+}
+.save{
+	background-color: rgb(236, 141, 141);
 }
 .btnwrap {
 	text-align: right;

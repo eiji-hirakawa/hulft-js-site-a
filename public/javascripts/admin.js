@@ -43,11 +43,9 @@ $(function () {
 		orientation: "vertical"
 	});
 	$(".tabhead").on("click", function (ev) {
-		if(confirm("保存した？？")) {
-			var $a = $(ev.target);
-			var id = $a.attr("href").replace("#q", "");
-			getQuestion(id);
-		}
+		var $a = $(ev.target);
+		var id = $a.attr("href").replace("#q", "");
+		getQuestion(id);
 	});
 	$(".submit").on("click", function (ev) {
 		var id = ev.target.id.replace("submit-", "");
