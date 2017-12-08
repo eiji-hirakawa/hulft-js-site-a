@@ -1,7 +1,7 @@
 
   var socket = null;
 $(function () {
-  socket = new WebSocket("ws://" + location.host + "/socket/");
+  socket = new WebSocket("wss://" + location.host + "/socket/");
   socket.onopen = function () {
     socket.send(JSON.stringify({
       protocol: "client",

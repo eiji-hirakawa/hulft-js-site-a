@@ -4,7 +4,7 @@ var CurrentSheet = {
 }
 var socket = null;
 $(function () {
-	socket = new WebSocket("ws://" + location.host + "/socket/");
+	socket = new WebSocket("wss://" + location.host + "/socket/");
 	// 接続確立
 	socket.onopen = function () {
 		socket.send(JSON.stringify({
